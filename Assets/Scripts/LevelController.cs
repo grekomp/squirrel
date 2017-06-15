@@ -4,14 +4,12 @@ using UnityEngine;
 
 public class LevelController : MonoBehaviour {
 	
-
-
 	void Start () {
 		GameController.levelController = this;
 	}
 
 	public void RestartLevel()
 	{
-
+		GameController.RestartLevel();
 	}
 }

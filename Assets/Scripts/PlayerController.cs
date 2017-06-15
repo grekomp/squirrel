@@ -29,7 +29,12 @@ public class PlayerController : MonoBehaviour {
 	// Coffee mode
 	public float coffeeModeDuration = 5.0f;
 	float coffeeModeDurationRemaining;
-	
+
+	//Dying
+	public bool dead;
+	public float deathDelay = 2.0f;
+	public float deathKnockBack = 15.0f;
+
 	// Misc
 	Rigidbody2D rb;
 	SpriteRenderer spriteRenderer;
@@ -50,14 +55,18 @@ public class PlayerController : MonoBehaviour {
 
 	void FixedUpdate()
 	{
-		// Coffee mode countdown
-		if (coffeeModeDurationRemaining > 0)
+		if (!dead)
 		{
-			coffeeModeDurationRemaining -= Time.fixedDeltaTime;
 
-			if (coffeeModeDurationRemaining <= 0)
+			// Coffee mode countdown
+			if (coffeeModeDurationRemaining > 0)
 			{
-				TriggerNormalMode();
+				coffeeModeDurationRemaining -= Time.fixedDeltaTime;
+
+				if (coffeeModeDurationRemaining <= 0)
+				{
+					TriggerNormalMode();
+				}
 			}
 		}
 
@@ -75,6 +84,7 @@ public class PlayerController : MonoBehaviour {
 				ResetJumpCharges();
 			}
 		}
+		
 
 		Moving();
 		Jumping();
@@ -85,6 +95,8 @@ public class PlayerController : MonoBehaviour {
 		animator.SetBool("sliding", sliding);
 		animator.SetBool("movingX", Mathf.Abs(rb.velocity.x) > 0.01f);
 		animator.SetFloat("velocityY", rb.velocity.y);
+
+
 	}
 
 	// Horizontal movement
@@ -94,7 +106,7 @@ public class PlayerController : MonoBehaviour {
 		float moveX = Input.GetAxisRaw("Horizontal");
 
 		// If there is input, increase velocity
-		if (moveX != 0.0f)
+		if (moveX != 0.0f && !dead)
 		{
 			// Increasing velocity
 			rb.velocity += new Vector2(moveX * currentPreset.moveSpeed * Time.fixedDeltaTime * currentPreset.acceleration, 0.0f);
@@ -161,7 +173,7 @@ public class PlayerController : MonoBehaviour {
 		}
 
 		// If jump is pressed and player is on ground, add velocity
-		if (!isJumping && !sliding && jump && jumpReleased && (jumpCharges > 0 || grounded))
+		if (!isJumping && !sliding && !dead && jump && jumpReleased && (jumpCharges > 0 || grounded))
 		{
 			rb.velocity = new Vector2(rb.velocity.x, currentPreset.jumpHeight);
 			isJumping = true;
@@ -174,7 +186,7 @@ public class PlayerController : MonoBehaviour {
 		}
 		else
 		{
-			if (jump && isJumping)
+			if (jump && isJumping && !dead)
 			{
 				if (rb.velocity.y > 0)
 				{
@@ -198,7 +210,7 @@ public class PlayerController : MonoBehaviour {
 	void WallSliding()
 	{
 		// If player is on the ground, stop sliding
-		if (grounded)
+		if (grounded || dead)
 		{
 			sliding = false;
 		}
@@ -284,5 +296,37 @@ public class PlayerController : MonoBehaviour {
 	void ResetJumpCharges()
 	{
 		jumpCharges = currentPreset.jumpCharges;
+	}
+
+	public void Death(Vector2 knockbackDirection)
+	{
+		dead = true;
+		animator.SetBool("dead", dead);
+
+		Vector2 knockback = knockbackDirection.normalized;
+		if (knockback.x > 0)
+		{
+			knockback = new Vector2(deathKnockBack, deathKnockBack);
+		} else
+		{
+			knockback = new Vector2(-deathKnockBack, deathKnockBack);
+		}
+
+		rb.velocity = knockback;
+
+		Invoke("RestartLevel", deathDelay);
+	}
+
+	public void EndLevel()
+	{
+		if (!dead)
+		{
+			GameController.instance.NextLevel();
+		}
+	}
+
+	void RestartLevel()
+	{
+		GameObject.Find("Level Controller").GetComponent<LevelController>().RestartLevel();
 	}
 }

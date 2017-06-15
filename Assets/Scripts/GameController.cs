@@ -5,8 +5,14 @@ using UnityEngine.SceneManagement;
 
 public class GameController : MonoBehaviour {
 	public static GameController instance;
-
 	public static LevelController levelController;
+
+	public GameObject[] staticEnemies;
+	public Level[] levels;
+	public Sprite[] backgrounds;
+
+	public static int currentLevel;
+	public int score = 0;
 
 	void Awake () {
 		// Enforce singleton pattern
@@ -27,8 +33,21 @@ public class GameController : MonoBehaviour {
 		if (Input.GetButtonDown("Restart")) RestartLevel();
 	}
 
-	void RestartLevel()
+	public static void RestartLevel()
 	{
+		instance.score = 0;
 		SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+	}
+
+	public void NextLevel()
+	{
+		currentLevel++;
+		SceneManager.LoadScene(levels[currentLevel].scene);
+
+	}
+
+	public Sprite GetBackground()
+	{
+		return backgrounds[levels[currentLevel].backgroundIndex];
 	}
 }
