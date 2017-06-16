@@ -55,48 +55,49 @@ public class PlayerController : MonoBehaviour {
 
 	void FixedUpdate()
 	{
-		if (!dead)
+		if (!GameController.paused)
 		{
-
-			// Coffee mode countdown
-			if (coffeeModeDurationRemaining > 0)
+			if (!dead)
 			{
-				coffeeModeDurationRemaining -= Time.fixedDeltaTime;
 
-				if (coffeeModeDurationRemaining <= 0)
+				// Coffee mode countdown
+				if (coffeeModeDurationRemaining > 0)
 				{
-					TriggerNormalMode();
+					coffeeModeDurationRemaining -= Time.fixedDeltaTime;
+
+					if (coffeeModeDurationRemaining <= 0)
+					{
+						TriggerNormalMode();
+					}
 				}
 			}
-		}
 
-		// Reset grounded status
-		grounded = false;
+			// Reset grounded status
+			grounded = false;
 
-		// Check if player is grounded
-		numContacts = rb.GetContacts(contacts);
+			// Check if player is grounded
+			numContacts = rb.GetContacts(contacts);
 
-		for (int i = 0; i < numContacts; i++)
-		{
-			if (contacts[i].normal.y > minGroundNormalY)
+			for (int i = 0; i < numContacts; i++)
 			{
-				grounded = true;
-				ResetJumpCharges();
+				if (contacts[i].normal.y > minGroundNormalY)
+				{
+					grounded = true;
+					ResetJumpCharges();
+				}
 			}
+
+
+			Moving();
+			Jumping();
+			WallSliding();
+
+			// Update animation
+			animator.SetBool("grounded", grounded);
+			animator.SetBool("sliding", sliding);
+			animator.SetBool("movingX", Mathf.Abs(rb.velocity.x) > 0.01f);
+			animator.SetFloat("velocityY", rb.velocity.y);
 		}
-		
-
-		Moving();
-		Jumping();
-		WallSliding();
-
-		// Update animation
-		animator.SetBool("grounded", grounded);
-		animator.SetBool("sliding", sliding);
-		animator.SetBool("movingX", Mathf.Abs(rb.velocity.x) > 0.01f);
-		animator.SetFloat("velocityY", rb.velocity.y);
-
-
 	}
 
 	// Horizontal movement
@@ -300,6 +301,8 @@ public class PlayerController : MonoBehaviour {
 
 	public void Death(Vector2 knockbackDirection)
 	{
+		if (!dead)
+			GameController.instance.deathCount++;
 		dead = true;
 		animator.SetBool("dead", dead);
 

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class Pickup : MonoBehaviour {
-	public int score;
+	public int score = 1;
 
 	void OnTriggerEnter2D(Collider2D other)
 	{

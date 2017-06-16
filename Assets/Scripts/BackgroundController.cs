@@ -13,12 +13,12 @@ public class BackgroundController : MonoBehaviour {
 		spriteRenderer = gameObject.GetComponent<SpriteRenderer>();
 		spriteRenderer.sprite = background;
 
-		float screenAspectRatio = Screen.width / Screen.height;
+		Camera cam = Camera.main;
 		float backgroundAspectRatio = spriteRenderer.bounds.extents.x / spriteRenderer.bounds.extents.y;
 
-		if (screenAspectRatio > backgroundAspectRatio)
+		if (cam.aspect > backgroundAspectRatio)
 		{
-			float scale = screenAspectRatio / backgroundAspectRatio;
+			float scale = cam.aspect / backgroundAspectRatio;
 			transform.localScale = new Vector3(scale, scale, 1);
 		}
 	}
