@@ -5,4 +5,5 @@ using UnityEngine;
 public class Level : MonoBehaviour {
 	public string scene;
 	public int backgroundIndex;
+	public int musicIndex;
 }

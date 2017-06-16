@@ -8,6 +8,13 @@ public class LevelEnd : MonoBehaviour {
 	{
 		if (other.CompareTag("Player"))
 		{
+			if (other.transform.position.x > transform.position.x)
+			{
+				Debug.Log("Flipping");
+				transform.localScale = new Vector3(-1, 1, 1);
+			}
+
+			GetComponentInChildren<Animator>().SetTrigger("Level End");
 			other.GetComponent<PlayerController>().EndLevel();
 		}
 	}

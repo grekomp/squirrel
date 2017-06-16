@@ -42,6 +42,13 @@ public class PlayerController : MonoBehaviour {
 	ContactPoint2D[] contacts = new ContactPoint2D[16];
 	int numContacts;
 
+	public AudioClip[] jumpSounds;
+	public AudioClip[] deathSounds;
+	public AudioClip[] doubleJumpSounds;
+	public AudioClip[] endLevelSounds;
+
+	AudioSource audioSource;
+
 	void Start () {
 		currentPreset = defaultPreset;
 		jumpCharges = currentPreset.jumpCharges;
@@ -51,6 +58,8 @@ public class PlayerController : MonoBehaviour {
 		animator = GetComponent<Animator>();
 
 		defaultGravityScale = rb.gravityScale;
+
+		audioSource = GetComponent<AudioSource>();
 	}
 
 	void FixedUpdate()
@@ -178,7 +187,16 @@ public class PlayerController : MonoBehaviour {
 		{
 			rb.velocity = new Vector2(rb.velocity.x, currentPreset.jumpHeight);
 			isJumping = true;
-			if (!grounded) jumpCharges--;
+			if (!grounded)
+			{
+				jumpCharges--;
+				PlayDoubleJumpSound();
+			}
+			else
+			{
+				PlayJumpSound();
+			}
+
 			if (jumpCharges < 0) jumpCharges = 0;
 			jumpReleased = false;
 
@@ -250,6 +268,8 @@ public class PlayerController : MonoBehaviour {
 
 						// Update animation
 						animator.SetTrigger("jump");
+
+						PlayJumpSound();
 					}
 
 					// Delay releasing the wall after pressing horizontal movement buttons, to give time for jumping
@@ -302,7 +322,10 @@ public class PlayerController : MonoBehaviour {
 	public void Death(Vector2 knockbackDirection)
 	{
 		if (!dead)
+		{
+			PlayDeathSound();
 			GameController.instance.deathCount++;
+		}
 		dead = true;
 		animator.SetBool("dead", dead);
 
@@ -324,12 +347,37 @@ public class PlayerController : MonoBehaviour {
 	{
 		if (!dead)
 		{
-			GameController.instance.NextLevel();
+			PlayEndLevelSound();
+			GameController.instance.EndLevel();
 		}
 	}
 
 	void RestartLevel()
 	{
 		GameObject.Find("Level Controller").GetComponent<LevelController>().RestartLevel();
+	}
+
+	void PlayJumpSound()
+	{
+		audioSource.clip = jumpSounds[Random.Range(0, jumpSounds.Length)];
+		audioSource.Play();
+	}
+
+	void PlayDoubleJumpSound()
+	{
+		audioSource.clip = doubleJumpSounds[Random.Range(0, doubleJumpSounds.Length)];
+		audioSource.Play();
+	}
+
+	void PlayEndLevelSound()
+	{
+		audioSource.clip = endLevelSounds[Random.Range(0, endLevelSounds.Length)];
+		audioSource.Play();
+	}
+
+	void PlayDeathSound()
+	{
+		audioSource.clip = deathSounds[Random.Range(0, deathSounds.Length)];
+		audioSource.Play();
 	}
 }

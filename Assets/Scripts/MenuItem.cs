@@ -12,7 +12,6 @@ public class MenuItem : MonoBehaviour {
 		entry.eventID = EventTriggerType.PointerClick;
 		entry.callback.AddListener((eventData) => { Activate(); });
 		trigger.triggers.Add(entry);
-		Debug.Log("initializing manu item");
 	}
 
 	public virtual void Activate() { }

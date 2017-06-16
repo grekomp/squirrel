@@ -10,7 +10,6 @@ public class LoadLevelMenuItem : MenuItem {
 	{
 		base.Activate();
 
-		Debug.Log("Activating menu item");
 		GameController.instance.LoadLevel(levelIndex);
 	}
 }

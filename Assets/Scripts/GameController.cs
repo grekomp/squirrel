@@ -10,19 +10,27 @@ public class GameController : MonoBehaviour {
 	public GameObject[] staticEnemies;
 	public Level[] levels;
 	public Sprite[] backgrounds;
+	public AudioClip[] musicTracks;
 
 	public static int currentLevel;
 	public int score = 0;
 	public int deathCount = 0;
+	public float nextLevelDelay = 2.0f;
 
 	public static bool playerHasControl = true;
 	public static bool paused = false;
+
+	AudioSource audioSource;
 
 	void Awake () {
 		// Enforce singleton pattern
 		if (instance == null)
 		{
 			instance = this;
+
+			audioSource = GetComponent<AudioSource>();
+			audioSource.clip = musicTracks[0];
+			audioSource.Play();
 		} else
 		{
 			Destroy(gameObject);
@@ -38,15 +46,15 @@ public class GameController : MonoBehaviour {
 
 	public static void RestartLevel()
 	{
-		instance.score = 0;
-		SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+		//instance.score = 0;
+		//SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+
+		instance.LoadLevel(currentLevel);
 	}
 
 	public void NextLevel()
 	{
-		score = 0;
-		currentLevel++;
-		SceneManager.LoadScene(levels[currentLevel].scene);
+		LoadLevel(currentLevel + 1);
 	}
 
 	public Sprite GetBackground()
@@ -64,14 +72,31 @@ public class GameController : MonoBehaviour {
 	public static void Quit()
 	{
 		Application.Quit();
-		UnityEditor.EditorApplication.isPlaying = false;
+		#if UNITY_EDITOR
+			UnityEditor.EditorApplication.isPlaying = false;
+		#endif
 	}
 
 	public void LoadLevel (int index)
 	{
+		// Reset Score
 		score = 0;
+
+		// If loading level with different music, change music
+		if (levels[index].musicIndex != levels[currentLevel].musicIndex)
+		{
+			audioSource.clip = musicTracks[levels[index].musicIndex];
+			audioSource.Stop();
+			audioSource.Play();
+		}
+
+		// Change current level
 		currentLevel = index;
+
+		// Unpause game
 		Pause(false);
+
+		// Load Scene
 		SceneManager.LoadScene(levels[currentLevel].scene);
 	}
 
@@ -83,11 +108,19 @@ public class GameController : MonoBehaviour {
 		{
 			playerHasControl = false;
 			Time.timeScale = 0.0f;
+			audioSource.Pause();
 		}
 		else
 		{
 			Time.timeScale = 1.0f;
+			if (!audioSource.isPlaying)
+				audioSource.Play();
 		}
+	}
+
+	public void EndLevel()
+	{
+		Invoke("NextLevel", nextLevelDelay);
 	}
 
 }
