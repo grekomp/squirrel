@@ -301,6 +301,7 @@ public class PlayerController : MonoBehaviour {
 	{
 		currentPreset = coffeePreset;
 		ResetJumpCharges();
+		GameController.instance.CoffeeMode(true);
 
 		coffeeModeDurationRemaining = coffeeModeDuration;
 	}
@@ -310,6 +311,7 @@ public class PlayerController : MonoBehaviour {
 	{
 		currentPreset = defaultPreset;
 		ResetJumpCharges();
+		GameController.instance.CoffeeMode(false);
 
 		coffeeModeDurationRemaining = 0.0f;
 	}

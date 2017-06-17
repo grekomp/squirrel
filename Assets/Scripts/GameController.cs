@@ -20,6 +20,9 @@ public class GameController : MonoBehaviour {
 	public static bool playerHasControl = true;
 	public static bool paused = false;
 
+	public float coffeeModePitch = 1.5f;
+	public float standardModePitch = 1.0f;
+
 	AudioSource audioSource;
 
 	void Awake () {
@@ -82,6 +85,9 @@ public class GameController : MonoBehaviour {
 		// Reset Score
 		score = 0;
 
+		// Reset sound pitch
+		CoffeeMode(false);
+
 		// If loading level with different music, change music
 		if (levels[index].musicIndex != levels[currentLevel].musicIndex)
 		{
@@ -123,4 +129,15 @@ public class GameController : MonoBehaviour {
 		Invoke("NextLevel", nextLevelDelay);
 	}
 
+
+	public void CoffeeMode(bool enable)
+	{
+		if (enable)
+		{
+			audioSource.pitch = coffeeModePitch;
+		} else
+		{
+			audioSource.pitch = standardModePitch;
+		}
+	}
 }
