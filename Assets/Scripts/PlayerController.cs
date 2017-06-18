@@ -41,12 +41,13 @@ public class PlayerController : MonoBehaviour {
 	Animator animator;
 	ContactPoint2D[] contacts = new ContactPoint2D[16];
 	int numContacts;
+	bool levelEnding = false;
 
+	// Sounds
 	public AudioClip[] jumpSounds;
 	public AudioClip[] deathSounds;
 	public AudioClip[] doubleJumpSounds;
 	public AudioClip[] endLevelSounds;
-
 	AudioSource audioSource;
 
 	void Start () {
@@ -347,8 +348,9 @@ public class PlayerController : MonoBehaviour {
 
 	public void EndLevel()
 	{
-		if (!dead)
+		if (!dead && !levelEnding)
 		{
+			levelEnding = true;
 			PlayEndLevelSound();
 			GameController.instance.EndLevel();
 		}
