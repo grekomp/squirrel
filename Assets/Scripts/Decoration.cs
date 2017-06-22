@@ -18,6 +18,7 @@ public class Decoration : MonoBehaviour {
 	
 	void LateUpdate () {
 		// Calculate movement based on camera movement and height
-		transform.position += CameraController.cameraMovement * depth / maxDepth * movementMultiplier;
+		transform.position =  initialPosition - (transform.position - CameraController.currentPosition) * depth / maxDepth * movementMultiplier;
+		transform.localPosition = new Vector3(transform.localPosition.x, transform.localPosition.y, depth);
 	}
 }
